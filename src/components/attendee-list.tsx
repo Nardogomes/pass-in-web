@@ -1,11 +1,21 @@
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal, Search } from "lucide-react";
+import { formatRelative } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { IconButton } from "./icon-button";
 import { Table } from "./table/table";
 import { TableHeader } from "./table/table-header";
 import { TableCell } from "./table/table-cell";
 import { TableRow } from "./table/table-row";
+import { ChangeEvent, useState } from "react";
+import { attendees } from "../data/attendees";
 
 export function AttendeeList() {
+  const [searchInput, setSearchInput] = useState('')
+
+  function onSearchInputChanged(event: ChangeEvent<HTMLInputElement>) {
+    setSearchInput(event.target.value)
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-3 items-center">
@@ -13,8 +23,9 @@ export function AttendeeList() {
 
         <div className="w-72 px-3 py-1.5 border border-white/10 rounded-lg flex items-center gap-3">
           <Search className="size-4 text-emerald-300" />
-          <input className="bg-transparent flex-1 outline-none border-0 p-0 text-sm" type="text" placeholder="Buscar participante..." />
+          <input onChange={onSearchInputChanged} className="bg-transparent flex-1 outline-none border-0 p-0 text-sm" type="text" placeholder="Buscar participante..." />
         </div>
+          {searchInput}
       </div>
 
       <Table>
@@ -32,21 +43,25 @@ export function AttendeeList() {
         </thead>
 
         <tbody>
-          {Array.from({ length: 5 }).map((_, i) => {
+          {attendees.map((attendee) => {
             return (
-              <TableRow key={i}>
+              <TableRow key={attendee.id}>
                 <TableCell>
                   <input type="checkbox" className="size-4 bg-black/20 rounded border border-white/10" />
                 </TableCell>
-                <TableCell>568956</TableCell>
+                <TableCell>{attendee.id}</TableCell>
                 <TableCell>
                   <div className="flex flex-col gap-1">
-                    <span className="font-semibold text-white">Ednardo Gomes dos Santos</span>
-                    <span>nardo@mail.com</span>
+                    <span className="font-semibold text-white">{attendee.nome}</span>
+                    <span>{attendee.email}</span>
                   </div>
                 </TableCell>
-                <TableCell>8 dias atrás</TableCell>
-                <TableCell>2 dias atrás</TableCell>
+                <TableCell>
+                  {formatRelative(attendee.createdAt, new Date(), {locale: ptBR} )}
+                </TableCell>
+                <TableCell>
+                  {formatRelative(attendee.checkedInAt, new Date(), {locale: ptBR} )}
+                </TableCell>
                 <TableCell>
                   <IconButton transparent>
                     <MoreHorizontal className="size-4" />
